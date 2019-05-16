@@ -2,16 +2,34 @@ const assert = require('assert');
 
 const {
     getCommandParams,
+    readFile,
 } = require('../src/core');
 
-const {
-    PARAM_NAMES,
-} = require('../src/config');
 
+describe('core', () => {
+    describe('readFile', () => {
+        let content = "";
 
-describe('core', function () {
-    describe('getCommandParams', function () {
-        it('should create object with null params', function (done) {
+        before((done) => {
+            readFile(require.resolve('./test.txt'))
+                .then((cont) => {
+                    content = cont;
+                })
+                .catch((error) => {
+                    content = error;
+                })
+                .finally(done)
+        });
+
+        it('should load test.txt', (done) => {
+            assert.equal(content, 'OK');
+
+            done()
+        })
+    });
+
+    describe('getCommandParams', () => {
+        it('should create object with null params', (done) => {
             const params = getCommandParams();
 
             assert.deepEqual(params, {
@@ -23,14 +41,14 @@ describe('core', function () {
             done();
         });
 
-        it('should create object of params', function (done) {
+        it('should create object of params', (done) => {
             const args = {
                 dir: 'value',
                 template: 'value',
                 vars: 'value',
             };
 
-            const params = getCommandParams(args, PARAM_NAMES);
+            const params = getCommandParams(args);
 
             assert.deepEqual(params, {
                 dir: 'value',
@@ -41,14 +59,14 @@ describe('core', function () {
             done();
         });
 
-        it('should create object of aliases', function (done) {
+        it('should create object of aliases', (done) => {
             const args = {
                 d: 'value',
                 t: 'value',
                 v: 'value',
             };
 
-            const params = getCommandParams(args, PARAM_NAMES);
+            const params = getCommandParams(args);
 
             assert.deepEqual(params, {
                 dir: 'value',
